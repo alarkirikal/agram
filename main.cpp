@@ -10,6 +10,8 @@
 #include <fstream>
 #include <list>
 #include <algorithm>
+#include <chrono>
+#include <cstring>
 
 #include <time.h>
 
