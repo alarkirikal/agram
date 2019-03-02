@@ -16,26 +16,74 @@
 
 #define NO_OF_CHARS 256
 
-std::string ISO8859ToUTF8(const char *str)
-{
-    std::string utf8("");
-    utf8.reserve(2*strlen(str) + 1);
+std::string UTF8toISO8859_1(const char * in) {
+    std::string out;
+    if (in == NULL)
+        return out;
 
-    for (; *str; ++str)
-    {
-        if (!(*str & 0x80))
-        {
-            utf8.push_back(*str);
-        } else
-        {
-            utf8.push_back(0xc2 | ((unsigned char)(*str) >> 6));
-            utf8.push_back(0xbf & *str);
+    unsigned int codepoint;
+    while (*in != 0) {
+        unsigned char ch = static_cast<unsigned char>(*in);
+        if (ch <= 0x7f)
+            codepoint = ch;
+        else if (ch <= 0xbf)
+            codepoint = (codepoint << 6) | (ch & 0x3f);
+        else if (ch <= 0xdf)
+            codepoint = ch & 0x1f;
+        else if (ch <= 0xef)
+            codepoint = ch & 0x0f;
+        else
+            codepoint = ch & 0x07;
+        ++in;
+
+        if (((*in & 0xc0) != 0x80) && (codepoint <= 0x10ffff)) {
+            char outc;
+            if (codepoint <= 255) {
+                if (codepoint != 0xa4 && codepoint != 0xa6 && codepoint != 0xa8
+                    && codepoint != 0xb4 && codepoint != 0xb8 && codepoint != 0xbc
+                    && codepoint != 0xbd && codepoint != 0xbe) {
+                    outc = static_cast<char>(codepoint);
+                }
+                else {
+                    outc = '?';
+                }
+            }
+            else {
+                if (codepoint == 0x20AC) {
+                    outc = 0xa4;
+                }
+                else if (codepoint == 0x0160) {
+                    outc = 0xa6;
+                }
+                else if (codepoint == 0x0161) {
+                    outc = 0xa8;
+                }
+                else if (codepoint == 0x017d) {
+                    outc = 0xb4;
+                }
+                else if (codepoint == 0x017e) {
+                    outc = 0xb8;
+                }
+                else if (codepoint == 0x0152) {
+                    outc = 0xbc;
+                }
+                else if (codepoint == 0x0153) {
+                    outc = 0xbd;
+                }
+                else if (codepoint == 0x0178) {
+                    outc = 0xbe;
+                }
+                else {
+                    outc = '?';
+                }
+            }
+            out.append(1, outc);
         }
     }
-    return utf8;
+    return out;
 }
 
-bool isAnagram(const char* str1, char* str2)
+bool isAnagram(const char* str1, const char* str2)
 {
     int count[NO_OF_CHARS] = { 0 };
     int i;
@@ -68,7 +116,7 @@ int main(int argc, const char * argv[]) {
         key.append(argv[i]);
     }
 
-    const char* keycstr = key.c_str();
+    const char* keycstr = UTF8toISO8859_1(key.c_str()).c_str();
 
     std::string matches;
     std::string line;
@@ -82,15 +130,10 @@ int main(int argc, const char * argv[]) {
             line.erase(pos, 1);
         }
 
-        std::string utf8line (ISO8859ToUTF8(line.c_str()));
-
-        char *linecstr = new char[utf8line.length() + 1];
-        strcpy(linecstr, utf8line.c_str());
-
-        if (isAnagram(keycstr, linecstr))
+        if (isAnagram(keycstr, line.c_str()))
         {
             matches.append(",");
-            matches.append(linecstr);
+            matches.append(line);
         }
     }
 
