@@ -152,15 +152,13 @@ int main(int argc, const char * argv[]) {
         if (isAnagram(keycstr, line.c_str()))
         {
             matches.append(",");
-            matches.append(line);
+            matches.append(ISO8859ToUTF8(line.c_str()));
         }
     }
-
-    const char* convertedMatches = ISO8859ToUTF8(matches.c_str()).c_str();
 
     auto elapsed = std::chrono::high_resolution_clock::now() - start;
     long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
 
-    printf("%lld%s\n",microseconds, convertedMatches);
+    printf("%lld%s\n",microseconds, matches.c_str());
     return 0;
 }
