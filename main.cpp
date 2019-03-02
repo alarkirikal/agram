@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <algorithm>
 #include <fstream>
 #include <chrono>
 #include <cstring>
