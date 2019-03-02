@@ -29,4 +29,4 @@ if __name__ == "__main__":
     result = anagrams()
 
     end = datetime.now()
-    print((end - start).microseconds, result)
+    print(str((end - start).microseconds) + "," + result)
