@@ -4,7 +4,7 @@ from collections import Counter
 import sys
 
 def anagrams():
-    retval = ""
+    retval = []
 
     key = " ".join(sys.argv[2:])
     arg_len = len(key) + 1
@@ -18,9 +18,9 @@ def anagrams():
             line = line.rstrip()
 
             if Counter(line) == arg_counter:
-                retval += "," + line
+                retval.append(line)
 
-    return retval
+    return ",".join(retval)
 
 
 if __name__ == "__main__":
