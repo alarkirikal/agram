@@ -8,8 +8,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <list>
-#include <algorithm>
 #include <chrono>
 #include <cstring>
 
@@ -30,10 +28,10 @@ bool isAnagram(char* str1, char* str2)
     if (str1[i] || str2[i])
         return false;
 
-    // See if there is any non-zero value in count array
     for (i = 0; i < NO_OF_CHARS; i++)
         if (count[i])
             return false;
+
     return true;
 }
 
@@ -54,7 +52,6 @@ int main(int argc, const char * argv[]) {
     char *keycstr = new char[key.length() + 1];
     strcpy(keycstr, key.c_str());
 
-    // List
     std::string matches;
     std::string line;
 
@@ -79,12 +76,9 @@ int main(int argc, const char * argv[]) {
         }
     }
 
-    // Time Stop
     auto elapsed = std::chrono::high_resolution_clock::now() - start;
     long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
 
-    // Print result
     printf("%lld%s\n",microseconds, matches.c_str());
-
     return 0;
 }
