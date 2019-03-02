@@ -4,23 +4,23 @@ from collections import Counter
 import sys
 
 def anagrams():
-    lines = []
+    retval = ""
 
     key = " ".join(sys.argv[2:])
-    arg_len = len(key)
+    arg_len = len(key) + 1
     arg_counter = Counter(key)
 
     with open(sys.argv[1], encoding='ISO-8859-15') as file:
         for line in file:
-            line = line.rstrip()
-
             if len(line) != arg_len:
                 continue
 
-            if Counter(line) == arg_counter:
-                lines.append(line)
+            line = line.rstrip()
 
-    return lines
+            if Counter(line) == arg_counter:
+                retval += "," + line
+
+    return retval
 
 
 if __name__ == "__main__":
@@ -29,4 +29,4 @@ if __name__ == "__main__":
     result = anagrams()
 
     end = datetime.now()
-    print((end - start).microseconds, ",".join(result), sep=",")
+    print((end - start).microseconds, result)
