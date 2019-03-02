@@ -16,6 +16,25 @@
 
 #define NO_OF_CHARS 256
 
+std::string ISO8859ToUTF8(const char *str)
+{
+    std::string utf8("");
+    utf8.reserve(2*strlen(str) + 1);
+
+    for (; *str; ++str)
+    {
+        if (!(*str & 0x80))
+        {
+            utf8.push_back(*str);
+        } else
+        {
+            utf8.push_back(0xc2 | ((unsigned char)(*str) >> 6));
+            utf8.push_back(0xbf & *str);
+        }
+    }
+    return utf8;
+}
+
 std::string UTF8toISO8859_1(const char * in) {
     std::string out;
     if (in == NULL)
@@ -137,9 +156,11 @@ int main(int argc, const char * argv[]) {
         }
     }
 
+    const char* convertedMatches = ISO8859ToUTF8(matches.c_str()).c_str();
+
     auto elapsed = std::chrono::high_resolution_clock::now() - start;
     long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
 
-    printf("%lld%s\n",microseconds, matches.c_str());
+    printf("%lld%s\n",microseconds, convertedMatches);
     return 0;
 }
