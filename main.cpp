@@ -16,40 +16,26 @@
 
 #define NO_OF_CHARS 256
 
-std::string UTF8toISO8859_1(const char * in)
+std::string ISO8859ToUTF8(const char *str)
 {
-    std::string out;
-    if (in == NULL)
-        return out;
+    std::string utf8("");
+    utf8.reserve(2*strlen(str) + 1);
 
-    unsigned int codepoint;
-    while (*in != 0)
+    for (; *str; ++str)
     {
-        unsigned char ch = static_cast<unsigned char>(*in);
-        if (ch <= 0x7f)
-            codepoint = ch;
-        else if (ch <= 0xbf)
-            codepoint = (codepoint << 6) | (ch & 0x3f);
-        else if (ch <= 0xdf)
-            codepoint = ch & 0x1f;
-        else if (ch <= 0xef)
-            codepoint = ch & 0x0f;
-        else
-            codepoint = ch & 0x07;
-        ++in;
-        if (((*in & 0xc0) != 0x80) && (codepoint <= 0x10ffff))
+        if (!(*str & 0x80))
         {
-            if (codepoint <= 255)
-            {
-                out.append(1, static_cast<char>(codepoint));
-            }
+            utf8.push_back(*str);
+        } else
+        {
+            utf8.push_back(0xc2 | ((unsigned char)(*str) >> 6));
+            utf8.push_back(0xbf & *str);
         }
     }
-
-    return out;
+    return utf8;
 }
 
-bool isAnagram(char* str1, char* str2)
+bool isAnagram(const char* str1, char* str2)
 {
     int count[NO_OF_CHARS] = { 0 };
     int i;
@@ -82,11 +68,7 @@ int main(int argc, const char * argv[]) {
         key.append(argv[i]);
     }
 
-    std::string isoKey ( UTF8toISO8859_1(key.c_str()) );
-
-    std::sort(isoKey.begin(), isoKey.end());
-    char *keycstr = new char[key.length() + 1];
-    strcpy(keycstr, isoKey.c_str());
+    const char* keycstr = key.c_str();
 
     std::string matches;
     std::string line;
@@ -100,15 +82,15 @@ int main(int argc, const char * argv[]) {
             line.erase(pos, 1);
         }
 
-        if (line.length() != key.length()) continue;
+        std::string utf8line (ISO8859ToUTF8(line.c_str()));
 
-        char *linecstr = new char[line.length() + 1];
-        strcpy(linecstr, line.c_str());
+        char *linecstr = new char[utf8line.length() + 1];
+        strcpy(linecstr, utf8line.c_str());
 
         if (isAnagram(keycstr, linecstr))
         {
             matches.append(",");
-            matches.append(line);
+            matches.append(linecstr);
         }
     }
 
