@@ -12,10 +12,11 @@
 #include <chrono>
 #include <cstring>
 #include <string>
+#include <codecvt>
 
 #define NO_OF_CHARS 256
 
-bool isAnagram(const char* str1, const wchar_t* str2)
+bool isAnagram(const char* str1, const char* str2)
 {
     int count[NO_OF_CHARS] = { 0 };
     int i;
@@ -24,11 +25,6 @@ bool isAnagram(const char* str1, const wchar_t* str2)
     {
         count[str1[i]]++;
         count[str2[i]]--;
-    }
-
-    if (str1[i] || str2[i])
-    {
-        return false;
     }
 
     for (i = 0; i < NO_OF_CHARS; i++)
@@ -42,10 +38,15 @@ bool isAnagram(const char* str1, const wchar_t* str2)
     return true;
 }
 
+std::string wstr_to_utf8( const std::wstring& utf16 ) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > wcu8;
+    return wcu8.to_bytes(utf16);
+}
+
 int main(int argc, const char* argv[]) {
     auto start = std::chrono::high_resolution_clock::now();
 
-    std::locale::global(std::locale("en_US.utf8"));
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > wcu8;
 
     std::string key;
     for (int i = 2; i < argc; ++i) {
@@ -57,23 +58,21 @@ int main(int argc, const char* argv[]) {
         key.append(argv[i]);
     }
 
-    const char* keycstr = key.c_str();
-
     std::string matches;
-
     std::wifstream file;
-    file.imbue(std::locale("en_US.utf8"));  // Maybe de_DE@euro or de_DE.ISO8859-15
-    file.open((std::string(argv[1])));
+    file.open(std::string(argv[1]));
     std::wstring line;
 
     while (std::getline(file,line))
     {
         line.erase(line.length() - 1, 1);
 
-        if (isAnagram(keycstr, line.c_str()))
+        std::string utf8line ( wcu8.to_bytes(line) );
+
+        if (isAnagram(key.c_str(), utf8line.c_str()))
         {
             matches.append(",");
-            std::wcout << "Found match: " << line << std::endl;
+            matches.append(utf8line);
         }
     }
 
