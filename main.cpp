@@ -131,6 +131,8 @@ bool isAnagram(const char* str1, const char* str2)
 int main(int argc, const char * argv[]) {
     auto start = std::chrono::high_resolution_clock::now();
 
+    std::locale::global(std::locale("en_US.utf8"))
+
     std::string key;
     for (int i = 2; i < argc; ++i) {
         if (i != 2)
@@ -144,9 +146,12 @@ int main(int argc, const char * argv[]) {
     const char* keycstr = key.c_str();
 
     std::string matches;
-    std::string line;
+    std::wstring line;
 
-    std::ifstream f((std::string(argv[1])));
+    std::wifstream file;
+    file.imbue(std::locale("en_US.utf8"));  // Maybe de_DE@euro
+    file.open((std::string(argv[1])));
+
     while (std::getline(f,line))
     {
         line.erase(line.length() - 1, 1);
