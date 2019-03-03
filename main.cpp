@@ -15,93 +15,7 @@
 
 #define NO_OF_CHARS 256
 
-std::string ISO8859ToUTF8(const char *str)
-{
-    std::string utf8("");
-    utf8.reserve(2*strlen(str) + 1);
-
-    for (; *str; ++str)
-    {
-        if (!(*str & 0x80))
-        {
-            utf8.push_back(*str);
-        } else
-        {
-            utf8.push_back(0xc2 | ((unsigned char)(*str) >> 6));
-            utf8.push_back(0xbf & *str);
-        }
-    }
-    return utf8;
-}
-
-std::string UTF8toISO8859_1(const char * in) {
-    std::string out;
-    if (in == NULL)
-        return out;
-
-    unsigned int codepoint;
-    while (*in != 0) {
-        unsigned char ch = static_cast<unsigned char>(*in);
-        if (ch <= 0x7f)
-            codepoint = ch;
-        else if (ch <= 0xbf)
-            codepoint = (codepoint << 6) | (ch & 0x3f);
-        else if (ch <= 0xdf)
-            codepoint = ch & 0x1f;
-        else if (ch <= 0xef)
-            codepoint = ch & 0x0f;
-        else
-            codepoint = ch & 0x07;
-        ++in;
-
-        if (((*in & 0xc0) != 0x80) && (codepoint <= 0x10ffff)) {
-            char outc;
-            if (codepoint <= 255) {
-                if (codepoint != 0xa4 && codepoint != 0xa6 && codepoint != 0xa8
-                    && codepoint != 0xb4 && codepoint != 0xb8 && codepoint != 0xbc
-                    && codepoint != 0xbd && codepoint != 0xbe) {
-                    outc = static_cast<char>(codepoint);
-                }
-                else {
-                    outc = '?';
-                }
-            }
-            else {
-                if (codepoint == 0x20AC) {
-                    outc = 0xa4;
-                }
-                else if (codepoint == 0x0160) {
-                    outc = 0xa6;
-                }
-                else if (codepoint == 0x0161) {
-                    outc = 0xa8;
-                }
-                else if (codepoint == 0x017d) {
-                    outc = 0xb4;
-                }
-                else if (codepoint == 0x017e) {
-                    outc = 0xb8;
-                }
-                else if (codepoint == 0x0152) {
-                    outc = 0xbc;
-                }
-                else if (codepoint == 0x0153) {
-                    outc = 0xbd;
-                }
-                else if (codepoint == 0x0178) {
-                    outc = 0xbe;
-                }
-                else {
-                    outc = '?';
-                }
-            }
-            out.append(1, outc);
-        }
-    }
-    return out;
-}
-
-bool isAnagram(const char* str1, const char* str2)
+bool isAnagram(const char* str1, const wchar_t* str2)
 {
     int count[NO_OF_CHARS] = { 0 };
     int i;
@@ -128,10 +42,10 @@ bool isAnagram(const char* str1, const char* str2)
     return true;
 }
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char* argv[]) {
     auto start = std::chrono::high_resolution_clock::now();
 
-    std::locale::global(std::locale("en_US.utf8"))
+    std::locale::global(std::locale("en_US.utf8"));
 
     std::string key;
     for (int i = 2; i < argc; ++i) {
@@ -146,25 +60,20 @@ int main(int argc, const char * argv[]) {
     const char* keycstr = key.c_str();
 
     std::string matches;
-    std::wstring line;
 
     std::wifstream file;
-    file.imbue(std::locale("en_US.utf8"));  // Maybe de_DE@euro
+    file.imbue(std::locale("en_US.utf8"));  // Maybe de_DE@euro or de_DE.ISO8859-15
     file.open((std::string(argv[1])));
+    std::wstring line;
 
-    while (std::getline(f,line))
+    while (std::getline(file,line))
     {
         line.erase(line.length() - 1, 1);
-
-        std::cout << "Key " << key << " len: " << key.size() << std::endl;
-        std::cout << "Word " << line << " len: " << line.size() << std::endl;
-        std::cout << "----" << std::endl;
 
         if (isAnagram(keycstr, line.c_str()))
         {
             matches.append(",");
-//            matches.append(ISO8859ToUTF8(line.c_str()));
-            matches.append(line);
+            std::wcout << "Found match: " << line << std::endl;
         }
     }
 
