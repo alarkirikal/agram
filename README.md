@@ -1,4 +1,5 @@
 # Python Anagram finder for Helmes Challenge
 
-usage:
-python3 bin/main.py /path/to/wordlist key_words
+example usage:
+
+`python3 bin/main.py extras/lemmad.txt alar`
