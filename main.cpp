@@ -11,6 +11,7 @@
 #include <fstream>
 #include <chrono>
 #include <cstring>
+#include <string>
 
 #define NO_OF_CHARS 256
 
@@ -140,7 +141,7 @@ int main(int argc, const char * argv[]) {
         key.append(argv[i]);
     }
 
-    const char* keycstr = UTF8toISO8859_1(key.c_str()).c_str();
+    const char* keycstr = key.c_str();
 
     std::string matches;
     std::string line;
@@ -150,10 +151,15 @@ int main(int argc, const char * argv[]) {
     {
         line.erase(line.length() - 1, 1);
 
+        std::cout << "Key " << key << " len: " << key.size() << std::endl;
+        std::cout << "Word " << line << " len: " << line.size() << std::endl;
+        std::cout << "----" << std::endl;
+
         if (isAnagram(keycstr, line.c_str()))
         {
             matches.append(",");
-            matches.append(ISO8859ToUTF8(line.c_str()));
+//            matches.append(ISO8859ToUTF8(line.c_str()));
+            matches.append(line);
         }
     }
 
