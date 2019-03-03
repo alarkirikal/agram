@@ -12,8 +12,6 @@
 #include <chrono>
 #include <cstring>
 
-#include <time.h>
-
 #define NO_OF_CHARS 256
 
 std::string ISO8859ToUTF8(const char *str)
@@ -107,17 +105,24 @@ bool isAnagram(const char* str1, const char* str2)
     int count[NO_OF_CHARS] = { 0 };
     int i;
 
-    for (i = 0; str1[i] && str2[i]; i++) {
+    for (i = 0; str1[i] && str2[i]; i++)
+    {
         count[str1[i]]++;
         count[str2[i]]--;
     }
 
     if (str1[i] || str2[i])
+    {
         return false;
+    }
 
     for (i = 0; i < NO_OF_CHARS; i++)
+    {
         if (count[i])
+        {
             return false;
+        }
+    }
 
     return true;
 }
@@ -143,11 +148,7 @@ int main(int argc, const char * argv[]) {
     std::ifstream f((std::string(argv[1])));
     while (std::getline(f,line))
     {
-        std::string::size_type pos = 0;
-        while ((pos = line.find("\r",pos)) != std::string::npos)
-        {
-            line.erase(pos, 1);
-        }
+        line.erase(line.length() - 1, 1);
 
         if (isAnagram(keycstr, line.c_str()))
         {
