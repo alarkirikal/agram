@@ -13,6 +13,7 @@
 #include <cstring>
 #include <string>
 #include <codecvt>
+#include <locale>
 
 #define NO_OF_CHARS 256
 
@@ -26,6 +27,9 @@ bool isAnagram(const char* str1, const char* str2)
         count[str1[i]]++;
         count[str2[i]]--;
     }
+
+    if (str1[i] || str2[i])
+        return false;
 
     for (i = 0; i < NO_OF_CHARS; i++)
     {
